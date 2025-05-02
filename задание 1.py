@@ -1,10 +1,9 @@
-import random
-import time
-import json
-from datetime import datetime
+import random #для генерации случайного числа
+import time #для замера времени игры
+import json #работа с json файлом статистики
+from datetime import datetime #запись даты игры
 
-def save_statistics(attempts, game_time, result):
-    """Сохраняет статистику игры в файл"""
+def save_statistics(attempts, game_time, result): #Сохраняет статистику игры в файл
     try:
         # Пытаемся загрузить существующую статистику
         with open('guess_number_stats.json', 'r') as f:
@@ -15,90 +14,90 @@ def save_statistics(attempts, game_time, result):
     
     # Добавляем новую запись
     stats.append({
-        'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        'attempts': attempts,
-        'time_seconds': round(game_time, 2),
-        'result': result
+        'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), #например 2025-01-05 14:30:00
+        'attempts': attempts, #например 5
+        'time_seconds': round(game_time, 2), #13.38
+        'result': result #win/lost
     })
     
     # Сохраняем обновленную статистику
-    with open('guess_number_stats.json', 'w') as f:
-        json.dump(stats, f, indent=4)
+    with open('guess_number_stats.json', 'w') as f: #менеджер контекста;имя файла для сохранения;резим записи write создаст новый/перезапишет сущест файл;обьект файла с именем
+        json.dump(stats, f, indent=4) #функция для записи данных json формате;список словарей с статистикой;файловфй обьект ( куда ведется запись); форматирования с отступами 4 пробела для читаемости
 
-def play_game():
+def play_game(): #обьявление функции с именем play game, функция не принимает параметров
     """Основная функция игры"""
     print("Добро пожаловать в игру 'Угадай число'!")
     print("Я загадал число от 1 до 100. Попробуй угадать!")
     
-    secret_number = random.randint(1, 100)
-    attempts = 0
-    start_time = time.time()
+    secret_number = random.randint(1, 100) #генерирует случайное число от 1 до 100, переменная для хранение загаданного числа
+    attempts = 0 #счетчик попыток , с 0 
+    start_time = time.time() #возвращение текущего времени в секундах;переменная для отчета времени начала игры
     
-    while True:
+    while True: #цикл, пока не встретится break
         try:
-            guess = int(input("Введите вашу догадку (1-100): "))
-        except ValueError:
+            guess = int(input("Введите вашу догадку (1-100): ")) #ввод от пользователя; преоьразования ввода в целое число;сохранение результата в guess
+        except ValueError: #если в блоке try возникла ошибка valueerror
             print("Пожалуйста, введите целое число!")
             continue
         
-        if guess < 1 or guess > 100:
+        if guess < 1 or guess > 100: #проверка, что число находится в диапозоне 1-100
             print("Число должно быть в диапазоне от 1 до 100!")
             continue
         
-        attempts += 1
+        attempts += 1 #увеличение счетчика попыток на 1 , если ввод был корректным
         
-        if guess < secret_number:
+        if guess < secret_number: #проверка, меньше ли введеное число загаданного
             print("Загаданное число больше.")
-        elif guess > secret_number:
+        elif guess > secret_number: #проверка, больше ли загаданное число загаданного
             print("Загаданное число меньше.")
         else:
-            end_time = time.time()
-            game_time = end_time - start_time
+            end_time = time.time() #фиксирует время окончание игры
+            game_time = end_time - start_time #вычисление общего времени игры
             print(f"Поздравляю! Вы угадали число за {attempts} попыток и {round(game_time, 2)} секунд!")
-            save_statistics(attempts, game_time, 'win')
-            break
+            save_statistics(attempts, game_time, 'win') #сохранение статистику игры , попытка, время , результат
+            break #выход из бесконечного цикла
         
-        if attempts >= 10:
-            end_time = time.time()
-            game_time = end_time - start_time
+        if attempts >= 10: #проверка, достигнуто ли макс колво попыток 10
+            end_time = time.time() #фиксирует тукущее воемя как окончание игры
+            game_time = end_time - start_time #общее время игры в секундах
             print(f"К сожалению, вы не угадали число за 10 попыток. Это было число {secret_number}.")
-            save_statistics(attempts, game_time, 'lose')
-            break
+            save_statistics(attempts, game_time, 'lose') #созранение статистику с результатом lose
+            break 
 
 def show_statistics():
     """Показывает статистику предыдущих игр"""
     try:
         with open('guess_number_stats.json', 'r') as f:
-            stats = json.load(f)
+            stats = json.load(f) #загрузка данных статистики из json файла
             
         print("\nСтатистика игр:")
-        print("-" * 50)
+        print("-" * 50) #создание строку из 50 символов -
         print(f"{'Дата':<20} | {'Попыток':<8} | {'Время (с)':<10} | {'Результат':<10}")
         print("-" * 50)
         
         for game in stats[-10:]: # Показываем последние 10 игр
-            print(f"{game['date']:<20} | {game['attempts']:<8} | {game['time_seconds']:<10} | {game['result']:<10}")
+            print(f"{game['date']:<20} | {game['attempts']:<8} | {game['time_seconds']:<10} | {game['result']:<10}") #строка для формативного вывода;название первого столбца;выравнивание по левому краю с общей шириной 20 символов;вертикальная черта как разделитель столбцов
         
         # Вычисляем общую статистику
-        wins = sum(1 for game in stats if game['result'] == 'win')
-        total_games = len(stats)
-        win_rate = (wins / total_games * 100) if total_games > 0 else 0
+        wins = sum(1 for game in stats if game['result'] == 'win') #перебирает все игры в списке;проверяет условие;для каждой подходящей игры генерирует 1;складывает облее колво побед
+        total_games = len(stats) #считает колво элементов в списке(общее колво сыгрвных игр)
+        win_rate = (wins / total_games * 100) if total_games > 0 else 0 #если игр нет, возвращает 0(иначе вычисляем процент побед (победы/всего игр*100)
         
-        print("\nОбщая статистика:")
+        print("\nОбщая статистика:") #вставляет пустую строку перед выводом \n
         print(f"Всего игр: {total_games}")
-        print(f"Побед: {wins} ({win_rate:.1f}%)")
+        print(f"Побед: {wins} ({win_rate:.1f}%)") #колво прбед;процент побед с одним знаком после точки
         
-    except (FileNotFoundError, json.JSONDecodeError):
+    except (FileNotFoundError, json.JSONDecodeError): #обрабатывает два типа ошибок; если файл статистики не найден;если файл есть, но содержит некорректные json файлы
         print("Статистика пока недоступна. Сыграйте хотя бы одну игру!")
 
 def main():
-    while True:
+    while True: #постоянное отображение меню после завершения действий
         print("\nМеню:")
         print("1. Начать новую игру")
         print("2. Показать статистику")
         print("3. Выход")
         
-        choice = input("Выберите действие (1-3): ")
+        choice = input("Выберите действие (1-3): ") #получение ввода от пользователя
         
         if choice == '1':
             play_game()
@@ -110,5 +109,5 @@ def main():
         else:
             print("Некорректный ввод. Пожалуйста, выберите 1, 2 или 3.")
 
-if __name__ == "__main__":
+if __name__ == "__main__": #проверка условия, явл ли файл главной исполняемой программой
     main()
