@@ -14,7 +14,7 @@ def save_statistics(attempts, game_time, result): #Сохраняет стати
     
     # Добавляем новую запись
     stats.append({
-        'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), #например 2025-01-05 14:30:00
+        'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 
         'attempts': attempts, #например 5
         'time_seconds': round(game_time, 2), #13.38
         'result': result #win/lost
