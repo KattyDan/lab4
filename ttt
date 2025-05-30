@@ -1,0 +1,20 @@
+# Пустое поле
+board = [" "]*9
+
+# Показываем поле
+def show():
+    print(board[0], "|", board[1], "|", board[2])
+    print("--+---+--")
+    print(board[3], "|", board[4], "|", board[5])
+    print("--+---+--")
+    print(board[6], "|", board[7], "|", board[8])
+
+# Основной цикл игры
+for i in range(9):
+    show()
+    move = int(input("Куда поставить (1-9): ")) - 1
+    player = "X" if i % 2 == 0 else "O" #чередование Х и О
+    board[move] = player
+
+show()
+print("Игра закончена!")
